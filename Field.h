@@ -11,9 +11,7 @@ typedef std::shared_ptr<Figur> FigurPtr;
 typedef std::shared_ptr<Field> FieldPtr;
 typedef std::vector<FieldPtr>  FieldVec;
 typedef std::vector<FieldVec>  FieldMat;
-
-typedef std::set<Figur*> FigurSet;
-typedef std::map<Color, FigurSet> FigurSetMap;
+typedef std::set<FieldPtr>     FieldSet;
 
 class Field
 {
@@ -22,12 +20,6 @@ public:
   ~Field();
 
   void        setActiveFigur(FigurPtr activeFigur);
-  void        addAttacker(Figur* attacker);
-  void        removeAttacker(Figur* attacker);
-
-  bool               hasAttackers(Color color);
-  const FigurSet&    getAttackers(Color color)   const { return attackers.at(color); }
-  const FigurSetMap& getAtackers()               const { return attackers; }
 
   FigurPtr    getActiveFigur()                const { return activeFigur; }
   Coord       getCoord()                      const { return coord; }
@@ -35,7 +27,6 @@ public:
 
 private:
   FigurPtr    activeFigur = nullptr;
-  FigurSetMap attackers;
   Coord       coord;
 };
 

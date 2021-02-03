@@ -2,7 +2,7 @@
 #ifndef CHECKER_H
 #define CHECKER_H
 
-#include "Figur.h"
+#include "Player.h"
 
 class Checker
 {
@@ -12,13 +12,13 @@ public:
 
   bool checkPath(Coord origCoord, Coord targetCoord);
   bool checkMove(FigurPtr activeFigur, FieldPtr targetField, bool capture);
-  bool checkCheck(Color color);
+  bool checkCheck(PlayerPtr activePlayer, PlayerPtr inactivePlayer);
 
 public:
   static bool checkCoord(Coord coord);
 
 private:
-  bool checkCheck(FieldPtr kingField);
+  bool checkCheck(PlayerPtr activePlayer, FieldPtr kingField);
 
 private:
   const FieldMat& board;

@@ -19,19 +19,3 @@ void Field::setActiveFigur(FigurPtr activeFigur)
 
   this->activeFigur = activeFigur;
 }
-
-void Field::addAttacker(Figur* attacker)
-{
-  attackers[attacker->getColor()].insert(attacker);
-}
-
-void Field::removeAttacker(Figur* attacker)
-{
-  attackers[attacker->getColor()].erase(attacker);
-}
-
-bool Field::hasAttackers(Color color)
-{
-  Color oppoColor = Tool::toOppoColor(color);
-  return attackers.find(oppoColor) != attackers.end() ? attackers[oppoColor].size() : false;;
-}

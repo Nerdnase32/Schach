@@ -52,9 +52,23 @@ void Engine::init()
   board[7][5]->setActiveFigur(std::make_shared<Bishop>(Color::BLACK));
 
   board[0][3]->setActiveFigur(std::make_shared<Queen>(Color::WHITE));
-  board[0][4]->setActiveFigur(std::make_shared<King>(Color::WHITE));
   board[7][3]->setActiveFigur(std::make_shared<Queen>(Color::BLACK));
-  board[7][4]->setActiveFigur(std::make_shared<King>(Color::BLACK));
+
+  KingPtr whiteKing = std::make_shared<King>(Color::WHITE);
+  white->setKing(whiteKing);
+  board[0][4]->setActiveFigur(whiteKing);
+
+  KingPtr blackKing = std::make_shared<King>(Color::BLACK);
+  black->setKing(blackKing);
+  board[7][4]->setActiveFigur(blackKing);
+
+  for (int y = 0; y < 8; y++)
+  {
+    white->addFigure(board[0][y]->getActiveFigur());
+    white->addFigure(board[1][y]->getActiveFigur());
+    black->addFigure(board[6][y]->getActiveFigur());
+    black->addFigure(board[7][y]->getActiveFigur());
+  }
 
   activePlayer   = white;
   inactivePlayer = black;
@@ -148,7 +162,7 @@ void Engine::selectFigur(Coord coord)
         std::cout << "figur has wrong color\n";
     }
     else
-      std::cout << "no figur on field" << Tool::coordToString(coord) << "\n";
+      std::cout << "no figur on field " << Tool::coordToString(coord) << "\n";
   }
   else
     std::cout << "invalid field " << Tool::coordToString(coord) << "\n";
@@ -201,26 +215,18 @@ bool Engine::tryMove(FieldPtr origField, FieldPtr targetField)
       }
       else
       {
-        result = tryCaptureFigur(origField, targetField);
+        result = tryCaptureFigur(origField, targetField); 
+        checkCheck();
       }
     }
     else
     {
       result = tryMoveFigur(origField, targetField);
+      checkCheck();
     }
   }
   else
     std::cout << "no figur on field\n";
-
-  bool check = checker.checkCheck(inactivePlayer->getColor());
-  if (check && activePlayer->isCheck())
-    std::cout << Tool::colorToString(activePlayer->getColor()) << " King still checked\n";
-  
-  if (check)
-  {
-    inactivePlayer->setCheck(check);
-    std::cout << "check!\n";
-  }
     
   return result;
 }
@@ -229,21 +235,23 @@ void Engine::moveFigur(FieldPtr origField, FieldPtr targetField)
 {
   FigurPtr activeFigur = origField->getActiveFigur();
 
-  FigurPtr targetFigur = targetField->getActiveFigur();
-  if (targetFigur)
-    targetFigur->clearAttackedField();
-
   origField->setActiveFigur(nullptr);
   targetField->setActiveFigur(activeFigur);
   activeFigur->setAttackers();
 
-  for (auto& entry : origField->getAtackers())
-  {
-    for (const auto& attacker : entry.second)
-      attacker->setAttackers();
-  }
-
   std::cout << activeFigur->getName() + " moved to " + targetField->getName() + "\n";
+}
+
+void Engine::checkCheck()
+{
+  bool inactiveCheck = checker.checkCheck(activePlayer, inactivePlayer);
+  bool activeCheck = checker.checkCheck(inactivePlayer, activePlayer);
+
+  if (activeCheck)
+    std::cout << "Invalid move. Own King is checked\n";
+
+  if (inactiveCheck)
+    std::cout << "check!\n";
 }
 
 bool Engine::tryCaptureFigur(FieldPtr origField, FieldPtr targetField)

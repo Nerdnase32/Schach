@@ -31,6 +31,7 @@ private:
   void switchPlayer();
   void changeField(FieldPtr targetField);
   void moveFigur(FieldPtr origField, FieldPtr targetField);
+  void checkCheck();
 
   bool tryMove(FieldPtr origField, FieldPtr targetField);
   bool tryCaptureFigur(FieldPtr origField, FieldPtr targetField);

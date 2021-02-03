@@ -19,19 +19,14 @@ void Figur::setAttackers()
 
 void Figur::clearAttackedField()
 {
-  const FieldMat& board = Engine::getEngine()->getBoard();
-  for (const auto& row : board)
-  {
-     for (const auto& field : row)
-      field->removeAttacker(this);
-  }
+  attackedFields.clear();
 }
 
 void Figur::addAttacker(size_t x, size_t y)
 {
   FieldPtr field = Engine::getEngine()->getField(Coord(x, y));
   if (field)
-    field->addAttacker(this);
+    attackedFields.insert(field);
 }
 
 void Figur::setAttackersStraightFields()
@@ -263,22 +258,13 @@ bool King::validMove(Coord targetCoord, bool capture)
 
 void King::setAttackedFields()
 {
-  for (int i = 1; i <= 8; i++)
+  for (size_t x = coord.x - 1; x <= coord.x + 1; x++)
   {
-    int x;
-    int y;
-
-    if (i <= 6)
+    for (size_t y = coord.y - 1; y <= coord.y + 1; y++)
     {
-      x = i % 2 == 0 ? coord.x - 1 : coord.x + 1;
-      y = i <= 3 ? coord.y - 1 : coord.y + 1;
+      if (x != coord.x && y != coord.y)
+        addAttacker(x, y);
     }
-    else
-    {
-      x = 0;
-      y = i % 2 == 0 ? coord.y + 1 : coord.y - 1;
-    }
-    addAttacker(x, y);
   }
 }
 

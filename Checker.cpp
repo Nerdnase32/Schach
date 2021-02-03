@@ -89,26 +89,30 @@ bool Checker::checkMove(FigurPtr activeFigur, FieldPtr targetField, bool capture
   return result;
 }
 
-bool Checker::checkCheck(Color color)
+bool Checker::checkCheck(PlayerPtr activePlayer, PlayerPtr inactivePlayer)
 {
-  for (auto row : board)
+  KingPtr king = inactivePlayer->getKing();
+  Coord coord = king->getCoord();
+  if (checkCoord(coord))
   {
-    for (auto field : row)
-    {
-      FigurPtr activeFigur = field->getActiveFigur();
-
-      if (activeFigur && activeFigur->getColor() == color)
-      {
-        KingPtr king = std::dynamic_pointer_cast<King>(activeFigur);
-        if (king)
-          return checkCheck(field);
-      }
-    }
+    FieldPtr kingField = board[coord.x][coord.y];
+    return checkCheck(activePlayer, kingField);
   }
+
   return false;
 }
 
-bool Checker::checkCheck(FieldPtr kingField)
+bool Checker::checkCheck(PlayerPtr activePlayer, FieldPtr kingField)
 {
-  return kingField->hasAttackers((kingField->getActiveFigur()->getColor()));
+  for (FigurPtr figur : activePlayer->getFigures())
+  {
+    const FieldSet& attackedFields = figur->getAttackedFields();
+    if (attackedFields.find(kingField) != attackedFields.end())
+    {
+      std::cout << Tool::colorToString(Tool::toOppoColor(activePlayer->getColor())) << " checked by " << figur->getName() << "\n";
+      return true;
+    }
+  }
+
+  return false;
 }

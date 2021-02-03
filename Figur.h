@@ -17,16 +17,16 @@ public:
 
   void        setAttackers();
   void        clearAttackedField();
-  void        setCoord(Coord coord) { this->coord = coord; }
+  void        setCoord(Coord coord)     { this->coord = coord; }
+  void        setMoved(bool moved)      { this->moved = moved; }
 
-  bool        hasMoved()     const { return moved; }
-  bool        canJump()      const { return jump; }
-  bool        isInvincible() const { return invincible; }
-  std::string getName()      const { return name; }
-  Color       getColor()     const { return color; }
-  Coord       getCoord()     const { return coord; }
-
-  void   setMoved(bool moved)      { this->moved = moved; }
+  bool        hasMoved()          const { return moved; }
+  bool        canJump()           const { return jump; }
+  bool        isInvincible()      const { return invincible; }
+  std::string getName()           const { return name; }
+  Color       getColor()          const { return color; }
+  Coord       getCoord()          const { return coord; }
+  FieldSet    getAttackedFields() const { return attackedFields; }
 
   virtual bool validMove(Coord targetCord, bool capture) = 0;
 
@@ -45,7 +45,9 @@ protected:
   double      value      = 0;
   Color       color      = Color::UNKNOWN;
   Coord       coord;
+  FieldSet    attackedFields;
   std::string name;
+
 };
 
 class Pawn;
