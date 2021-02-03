@@ -37,7 +37,7 @@ void Chess::processRequest(const std::string& entry)
   }
   else if (command.getType() == Type::EXIT)
   {
-    processExit();
+    processExit(EXIT_SUCCESS);
   }
   else
     std::cout << "unknown command type\n";

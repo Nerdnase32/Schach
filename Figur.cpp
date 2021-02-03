@@ -151,23 +151,21 @@ bool Pawn::validMove(FieldPtr targetField)
 {
   bool result = false;
 
-  Coord targetCoord = targetField->getCoord();
-  bool  capture     = targetField->getActiveFigur() != nullptr;
+  
 
-  if (!capture && coord.y == targetCoord.y)
+  if (targetField->getActiveFigur())
   {
+    result = Figur::validMove(targetField);
+  }
+  else
+  {
+    Coord targetCoord = targetField->getCoord();
     int diff = (int)targetCoord.x - (int)coord.x;
 
     if (color == Color::WHITE)
-      result = diff == 1 || (!moved && diff == 2);
+      result = coord.y == targetCoord.y && diff == 1 || (!moved && diff == 2);
     else if (color == Color::BLACK)
-      result = diff == -1 || (!moved && diff == -2);
-  }
-  else if (capture && abs((int)(coord.y - targetCoord.y)) == 1)
-  {
-    int diff = (int)targetCoord.x - (int)coord.x;
-
-    result = color == Color::WHITE ? diff == 1 : diff == -1;
+      result = coord.y == targetCoord.y && diff == -1 || (!moved && diff == -2);
   }
 
   return result;
@@ -198,17 +196,28 @@ void Knight::setAttackedFields()
 {
   for (int i = 1; i <= 8; i++)
   {
-    size_t x;
-    size_t y;
-    if (i <= 4)
+    int x = (int)coord.x;
+    int y = (int)coord.y;
+
+    if (i <= 2)
     {
-      x = i % 2 == 0 ? coord.x + 1 : coord.x - 1;
-      y = i % 2 != 0 ? coord.y + 2 : coord.x - 2;
+      x = i % 2 == 0 ? x + 1 : x - 1;
+      y = i % 2 != 0 ? y + 2 : y - 2;
     }
-    else
+    else if (i <= 4)
     {
-      x = i % 2 == 0 ? coord.x + 2 : coord.x - 2;
-      y = i % 2 != 0 ? coord.y + 1 : coord.x - 1;
+      x = i % 2 == 0 ? x + 2 : x - 2;
+      y = i % 2 != 0 ? y + 1 : y - 1;
+    }
+    else if (i <= 6)
+    {
+      x = i % 2 == 0 ? x + 1 : x - 1;
+      y = i % 2 == 0 ? y + 2 : y - 2;
+    }
+    else 
+    {
+      x = i % 2 == 0 ? x + 2 : x - 2;
+      y = i % 2 == 0 ? y + 1 : y - 1;
     }
 
     addAttacker(x, y);

@@ -95,7 +95,7 @@ void Engine::processLogFigures(Argument arg)
 
           counter++;
           if (counter % 4 == 0)
-            log += "\n";
+            log += " \n";
           else
             log += ", ";
         }
@@ -105,7 +105,7 @@ void Engine::processLogFigures(Argument arg)
 
   if (log.length())
   {
-    log.replace(log.length() - 2, log.length(), "\n");
+    log.replace(log.length() - 2, log.length(), " \n");
 
     std::cout << log;
   }
@@ -266,11 +266,9 @@ void Engine::moveBack(FieldPtr origField, FieldPtr targetField)
   FigurPtr movedFigur = targetField->getActiveFigur();
   if (movedFigur)
   {
+    movedFigur->setMoved(tempMoved);
     origField->setActiveFigur(movedFigur);
     targetField->setActiveFigur(tempCapturedFigure);
-
-    tempCapturedFigure = nullptr;
-    movedFigur->setMoved(tempMoved);
 
     activePlayer->updateFigures();
     inactivePlayer->updateFigures();

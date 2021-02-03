@@ -15,7 +15,7 @@ public:
   void processRequest(const std::string& entry);
 
 private:
-  void processExit(int exitCode = EXIT_SUCCESS);
+  void processExit(int exitCode);
 
 private:
   Engine& engine = *Engine::getEngine();

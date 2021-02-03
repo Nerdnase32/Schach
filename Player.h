@@ -24,11 +24,11 @@ public:
   const FigurSet& getLostFigures()          const { return lostFigures; }
   const FigurSet& getFigures()              const { return figures; }
 
-  void        setCheck(bool check)                { this->check = check; }
-  void        setKing(KingPtr king)               { this->king = king; }
-  void        addLostFigure(FigurPtr activeFigur) { this->lostFigures.insert(activeFigur); }
-  void        addFigure(FigurPtr figur)           { this->figures.insert(figur); }
-  void        removeFigure(FigurPtr figur)        { this->figures.erase(figur); }
+  void setCheck(bool check)                       { this->check = check; }
+  void setKing(KingPtr king)                      { this->king = king; }
+  void addLostFigure(FigurPtr activeFigur)        { this->lostFigures.insert(activeFigur); }
+  void addFigure(FigurPtr figur)                  { this->figures.insert(figur); }
+  void removeFigure(FigurPtr figur)               { this->figures.erase(figur); }
 
 private:
   FigurSet lostFigures;

@@ -14,7 +14,7 @@
 typedef unsigned int uint;
 
 enum class Argument { ONLY_MOVED, UNKNOWN };
-enum class Type   { LOG, EXIT, COORD, UNKNOWN };
-enum class Color  { WHITE, BLACK, UNKNOWN };
+enum class Type     { LOG, EXIT, COORD, UNKNOWN };
+enum class Color    { WHITE, BLACK, UNKNOWN };
 
 #endif // !DEFINES_H
