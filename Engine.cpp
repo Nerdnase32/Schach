@@ -267,6 +267,7 @@ bool Engine::tryCaptureFigur(FieldPtr origField, FieldPtr targetField)
       std::cout << targetFigur->getName() + " captured\n";
 
       inactivePlayer->addLostFigure(targetFigur);
+      inactivePlayer->removeFigure(targetFigur);
 
       moveFigur(origField, targetField);
 

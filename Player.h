@@ -17,18 +17,20 @@ public:
   bool        isCheck()                     const { return check; }
   Color       getColor()                    const { return color; }
   std::string getName()                     const { return Tool::colorToString(color); }
-  FigurVec    getLostFigures()              const { return lostFigures; }
-  FigurVec    getFigures()                  const { return figures; }
   KingPtr     getKing()                     const { return king; }
+
+  const FigurSet& getLostFigures()          const { return lostFigures; }
+  const FigurSet& getFigures()              const { return figures; }
 
   void        setCheck(bool check)                { this->check = check; }
   void        setKing(KingPtr king)               { this->king = king; }
-  void        addLostFigure(FigurPtr activeFigur) { this->lostFigures.push_back(activeFigur); }
-  void        addFigure(FigurPtr figur)           { this->figures.push_back(figur); }
+  void        addLostFigure(FigurPtr activeFigur) { this->lostFigures.insert(activeFigur); }
+  void        addFigure(FigurPtr figur)           { this->figures.insert(figur); }
+  void        removeFigure(FigurPtr figur)        { this->figures.erase(figur); }
 
 private:
-  FigurVec lostFigures;
-  FigurVec figures;
+  FigurSet lostFigures;
+  FigurSet figures;
   KingPtr  king;
 
   bool   check  = false;

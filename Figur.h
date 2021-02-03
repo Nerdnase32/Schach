@@ -8,6 +8,7 @@ class Figur;
 
 typedef std::shared_ptr<Figur> FigurPtr;
 typedef std::vector<FigurPtr>  FigurVec;
+typedef std::set<FigurPtr>     FigurSet;
 
 class Figur : std::enable_shared_from_this<Figur>
 {
