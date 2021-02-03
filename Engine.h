@@ -31,8 +31,9 @@ private:
   void switchPlayer();
   void changeField(FieldPtr targetField);
   void moveFigur(FieldPtr origField, FieldPtr targetField);
-  void checkCheck();
+  void moveBack(FieldPtr origField, FieldPtr targetField);
 
+  bool checkCheck();
   bool tryMove(FieldPtr origField, FieldPtr targetField);
   bool tryCaptureFigur(FieldPtr origField, FieldPtr targetField);
   bool tryMoveFigur(FieldPtr origField, FieldPtr targetField);
@@ -44,6 +45,9 @@ private:
   PlayerPtr activePlayer   = nullptr;
   PlayerPtr inactivePlayer = nullptr;
   FieldPtr  activeField    = nullptr;
+
+  FigurPtr  tempCapturedFigure = nullptr;
+  bool      tempMoved = false;
 
   Checker checker;
 

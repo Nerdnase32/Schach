@@ -69,6 +69,7 @@ void Engine::init()
     black->addFigure(board[6][y]->getActiveFigur());
     black->addFigure(board[7][y]->getActiveFigur());
   }
+
   white->updateFigures();
   black->updateFigures();
 
@@ -221,14 +222,20 @@ bool Engine::tryMove(FieldPtr origField, FieldPtr targetField)
       }
       else
       {
-        result = tryCaptureFigur(origField, targetField); 
-        checkCheck();
+        if (tryCaptureFigur(origField, targetField))
+        {
+          if (!(result = checkCheck()))
+            moveBack(origField, targetField);
+        }
       }
     }
     else
     {
-      result = tryMoveFigur(origField, targetField);
-      checkCheck();
+      if (tryMoveFigur(origField, targetField))
+      {
+        if (!(result = checkCheck()))
+          moveBack(origField, targetField);
+      }
     }
   }
   else
@@ -241,6 +248,9 @@ void Engine::moveFigur(FieldPtr origField, FieldPtr targetField)
 {
   FigurPtr activeFigur = origField->getActiveFigur();
 
+  tempCapturedFigure = targetField->getActiveFigur();
+  tempMoved          = activeFigur->hasMoved();
+
   origField->setActiveFigur(nullptr);
   targetField->setActiveFigur(activeFigur);
   activeFigur->setMoved(true);
@@ -251,16 +261,39 @@ void Engine::moveFigur(FieldPtr origField, FieldPtr targetField)
   std::cout << activeFigur->getName() + " moved to " + targetField->getName() + "\n";
 }
 
-void Engine::checkCheck()
+void Engine::moveBack(FieldPtr origField, FieldPtr targetField)
 {
+  FigurPtr movedFigur = targetField->getActiveFigur();
+  if (movedFigur)
+  {
+    origField->setActiveFigur(movedFigur);
+    targetField->setActiveFigur(tempCapturedFigure);
+
+    tempCapturedFigure = nullptr;
+    movedFigur->setMoved(tempMoved);
+
+    activePlayer->updateFigures();
+    inactivePlayer->updateFigures();
+  }
+}
+
+bool Engine::checkCheck()
+{
+  bool result = true;
+
   bool inactiveCheck = checker.checkCheck(activePlayer, inactivePlayer);
   bool activeCheck = checker.checkCheck(inactivePlayer, activePlayer);
 
   if (activeCheck)
+  {
     std::cout << "Invalid move. Own King is checked\n";
+    result = false;
+  }
 
   if (inactiveCheck)
     std::cout << "check!\n";
+
+  return result;
 }
 
 bool Engine::tryCaptureFigur(FieldPtr origField, FieldPtr targetField)
