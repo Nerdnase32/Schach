@@ -36,48 +36,51 @@ void Figur::addAttacker(size_t x, size_t y)
 
 void Figur::setAttackersStraightFields()
 {
-  for (size_t x = coord.x + 1; x < 8; x++)
+  int coordX = (int)coord.x;
+  int coordY = (int)coord.y;
+
+  for (int x = coordX + 1; x < 8; x++)
   {
-    FieldPtr field = Engine::getEngine()->getField(Coord(x, coord.y));
+    FieldPtr field = Engine::getEngine()->getField(Coord(x, coordY));
     if (field)
     {
-      addAttacker(x, coord.y);
+      addAttacker(x, coordY);
       if (field->getActiveFigur())
         break;
     }
     else
       break;
   }
-  for (size_t x = coord.x - 1; x > 0; x--)
+  for (int x = coordX - 1; x > 0; x--)
   {
-    FieldPtr field = Engine::getEngine()->getField(Coord(x, coord.y));
+    FieldPtr field = Engine::getEngine()->getField(Coord(x, coordY));
     if (field)
     {
-      addAttacker(x, coord.y);
+      addAttacker(x, coordY);
       if (field->getActiveFigur())
         break;
     }
     else
       break;
   }
-  for (size_t y = coord.y + 1; y < 8; y++)
+  for (int y = coordY + 1; y < 8; y++)
   {
-    FieldPtr field = Engine::getEngine()->getField(Coord(coord.x, y));
+    FieldPtr field = Engine::getEngine()->getField(Coord(coordX, y));
     if (field)
     {
-      addAttacker(coord.x, y);
+      addAttacker(coordX, y);
       if (field->getActiveFigur())
         break;
     }
     else
       break;
   }
-  for (size_t y = coord.y - 1; y > 0; y--)
+  for (int y = coordY - 1; y > 0; y--)
   {
-    FieldPtr field = Engine::getEngine()->getField(Coord(coord.x, y));
+    FieldPtr field = Engine::getEngine()->getField(Coord(coordX, y));
     if (field)
     {
-      addAttacker(coord.x, y);
+      addAttacker(coordX, y);
       if (field->getActiveFigur())
         break;
     }
@@ -88,7 +91,10 @@ void Figur::setAttackersStraightFields()
 
 void Figur::setAttackersDiagonalFields()
 {
-  for (size_t x = coord.x + 1, y = coord.y + 1; x < 8 && y < 8; x++, y++)
+  int coordX = (int)coord.x;
+  int coordY = (int)coord.y;
+
+  for (int x = coordX + 1, y = coordY + 1; x < 8 && y < 8; x++, y++)
   {
     FieldPtr field = Engine::getEngine()->getField(Coord(x, y));
     if (field)
@@ -100,7 +106,7 @@ void Figur::setAttackersDiagonalFields()
     else
       break;
   }
-  for (size_t x = coord.x - 1, y = coord.y + 1; x > 0 && y < 8; x--, y++)
+  for (int x = coordX - 1, y = coordY + 1; x >= 0 && y < 8; x--, y++)
   {
     FieldPtr field = Engine::getEngine()->getField(Coord(x, y));
     if (field)
@@ -112,7 +118,7 @@ void Figur::setAttackersDiagonalFields()
     else
       break;
   }
-  for (size_t x = coord.x + 1, y = coord.y - 1; x < 8 && y > 0; x++, y--)
+  for (int x = coordX + 1, y = coordY - 1; x < 8 && y >= 0; x++, y--)
   {
     FieldPtr field = Engine::getEngine()->getField(Coord(x, y));
     if (field)
@@ -124,7 +130,7 @@ void Figur::setAttackersDiagonalFields()
     else
       break;
   }
-  for (size_t x = coord.x - 1, y = coord.y - 1; x > 0 && y > 0; x--, y--)
+  for (int x = coordX - 1, y = coordY - 1; x >= 0 && y >= 0; x--, y--)
   {
     FieldPtr field = Engine::getEngine()->getField(Coord(x, y));
     if (field)
@@ -173,12 +179,12 @@ bool Pawn::validMove(FieldPtr targetField)
 
 void Pawn::setAttackedFields()
 {
-  size_t x = color == Color::WHITE ? coord.x + 1 : coord.x - 1;
-  size_t y = coord.y + 1;
+  int x = color == Color::WHITE ? (int)coord.x + 1 : (int)coord.x - 1;
+  int y = (int)coord.y + 1;
 
   addAttacker(x, y);
 
-  y = coord.y - 1;
+  y = (int)coord.y - 1;
   addAttacker(x, y);
 }
 
@@ -251,11 +257,14 @@ King::~King()
 
 void King::setAttackedFields()
 {
-  for (size_t x = coord.x - 1; x <= coord.x + 1; x++)
+  int coordX = (int)coord.x;
+  int coordY = (int)coord.y;
+
+  for (int x = coordX - 1; x <= coordX + 1; x++)
   {
-    for (size_t y = coord.y - 1; y <= coord.y + 1; y++)
+    for (int y = coordY - 1; y <= coordY + 1; y++)
     {
-      if (x != coord.x && y != coord.y)
+      if (x != coordX || y != coordY)
         addAttacker(x, y);
     }
   }
