@@ -14,6 +14,8 @@ public:
   Player(Color color);
   ~Player();
 
+  void updateFigures();
+
   bool        isCheck()                     const { return check; }
   Color       getColor()                    const { return color; }
   std::string getName()                     const { return Tool::colorToString(color); }

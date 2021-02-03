@@ -69,6 +69,8 @@ void Engine::init()
     black->addFigure(board[6][y]->getActiveFigur());
     black->addFigure(board[7][y]->getActiveFigur());
   }
+  white->updateFigures();
+  black->updateFigures();
 
   activePlayer   = white;
   inactivePlayer = black;
@@ -99,9 +101,13 @@ void Engine::processLogFigures(Argument arg)
       }
     }
   }
-  log.replace(log.length() - 2, log.length(), "\n");
 
-  std::cout << log;
+  if (log.length())
+  {
+    log.replace(log.length() - 2, log.length(), "\n");
+
+    std::cout << log;
+  }
 }
 
 void Engine::processNewCoords(Coord coord)
@@ -237,7 +243,10 @@ void Engine::moveFigur(FieldPtr origField, FieldPtr targetField)
 
   origField->setActiveFigur(nullptr);
   targetField->setActiveFigur(activeFigur);
-  activeFigur->setAttackers();
+  activeFigur->setMoved(true);
+
+  activePlayer->updateFigures();
+  inactivePlayer->updateFigures();
 
   std::cout << activeFigur->getName() + " moved to " + targetField->getName() + "\n";
 }
@@ -259,7 +268,7 @@ bool Engine::tryCaptureFigur(FieldPtr origField, FieldPtr targetField)
   bool result = false;
 
   FigurPtr activeFigur = origField->getActiveFigur();
-  if (activeFigur && checker.checkMove(activeFigur, targetField, true))
+  if (activeFigur && activeFigur->validMove(targetField))
   {
     FigurPtr targetFigur = targetField->getActiveFigur();
     if (targetFigur)
@@ -285,7 +294,7 @@ bool Engine::tryMoveFigur(FieldPtr origField, FieldPtr targetField)
   bool result = false;
 
   FigurPtr activeFigur = origField->getActiveFigur();
-  if (activeFigur && checker.checkMove(activeFigur, targetField, false))
+  if (activeFigur && activeFigur->validMove(targetField))
   {
     moveFigur(origField, targetField);
 

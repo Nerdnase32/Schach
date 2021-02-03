@@ -16,7 +16,7 @@ public:
   Figur(Color color);
   ~Figur();
 
-  void        setAttackers();
+  void        updateAttackedFields();
   void        clearAttackedField();
   void        setCoord(Coord coord)     { this->coord = coord; }
   void        setMoved(bool moved)      { this->moved = moved; }
@@ -29,7 +29,7 @@ public:
   Coord       getCoord()          const { return coord; }
   FieldSet    getAttackedFields() const { return attackedFields; }
 
-  virtual bool validMove(Coord targetCord, bool capture) = 0;
+  virtual bool validMove(FieldPtr targetField);
 
 private:
   virtual void setAttackedFields() = 0;
@@ -61,7 +61,7 @@ public:
   Pawn(Color color);
   ~Pawn();
 
-  bool validMove(Coord targetCoord, bool capture) override;
+  bool validMove(FieldPtr targetField) override;
   void setAttackedFields() override;
 };
 
@@ -75,7 +75,6 @@ public:
   Knight(Color color);
   ~Knight();
 
-  bool validMove(Coord targetCoord, bool capture) override;
   void setAttackedFields() override;
 };
 
@@ -89,7 +88,6 @@ public:
   Queen(Color color);
   ~Queen();
 
-  bool validMove(Coord targetCoord, bool capture) override;
   void setAttackedFields() override;
 };
 
@@ -103,7 +101,6 @@ public:
   King(Color color);
   ~King();
 
-  bool validMove(Coord targetCoord, bool capture) override;
   void setAttackedFields() override;
 };
 
@@ -117,7 +114,6 @@ public:
   Rook(Color color);
   ~Rook();
 
-  bool validMove(Coord targetCoord, bool capture) override;
   void setAttackedFields() override;
 };
 
@@ -131,7 +127,6 @@ public:
   Bishop(Color color);
   ~Bishop();
 
-  bool validMove(Coord targetCoord, bool capture) override;
   void setAttackedFields() override;
 };
 

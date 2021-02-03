@@ -11,7 +11,7 @@ Figur::~Figur()
 {
 }
 
-void Figur::setAttackers()
+void Figur::updateAttackedFields()
 {
   clearAttackedField();
   setAttackedFields();
@@ -20,6 +20,11 @@ void Figur::setAttackers()
 void Figur::clearAttackedField()
 {
   attackedFields.clear();
+}
+
+bool Figur::validMove(FieldPtr targetField)
+{
+  return attackedFields.find(targetField) != attackedFields.end();
 }
 
 void Figur::addAttacker(size_t x, size_t y)
@@ -31,7 +36,7 @@ void Figur::addAttacker(size_t x, size_t y)
 
 void Figur::setAttackersStraightFields()
 {
-  for (int x = coord.x + 1; x < 8; x++)
+  for (size_t x = coord.x + 1; x < 8; x++)
   {
     FieldPtr field = Engine::getEngine()->getField(Coord(x, coord.y));
     if (field)
@@ -43,7 +48,7 @@ void Figur::setAttackersStraightFields()
     else
       break;
   }
-  for (int x = coord.x - 1; x > 0; x--)
+  for (size_t x = coord.x - 1; x > 0; x--)
   {
     FieldPtr field = Engine::getEngine()->getField(Coord(x, coord.y));
     if (field)
@@ -55,7 +60,7 @@ void Figur::setAttackersStraightFields()
     else
       break;
   }
-  for (int y = coord.y + 1; y < 8; y++)
+  for (size_t y = coord.y + 1; y < 8; y++)
   {
     FieldPtr field = Engine::getEngine()->getField(Coord(coord.x, y));
     if (field)
@@ -67,7 +72,7 @@ void Figur::setAttackersStraightFields()
     else
       break;
   }
-  for (int y = coord.y - 1; y > 0; y--)
+  for (size_t y = coord.y - 1; y > 0; y--)
   {
     FieldPtr field = Engine::getEngine()->getField(Coord(coord.x, y));
     if (field)
@@ -83,7 +88,7 @@ void Figur::setAttackersStraightFields()
 
 void Figur::setAttackersDiagonalFields()
 {
-  for (int x = coord.x + 1, y = coord.y + 1; x < 8 && y < 8; x++, y++)
+  for (size_t x = coord.x + 1, y = coord.y + 1; x < 8 && y < 8; x++, y++)
   {
     FieldPtr field = Engine::getEngine()->getField(Coord(x, y));
     if (field)
@@ -95,7 +100,7 @@ void Figur::setAttackersDiagonalFields()
     else
       break;
   }
-  for (int x = coord.x - 1, y = coord.y + 1; x > 0 && y < 8; x--, y++)
+  for (size_t x = coord.x - 1, y = coord.y + 1; x > 0 && y < 8; x--, y++)
   {
     FieldPtr field = Engine::getEngine()->getField(Coord(x, y));
     if (field)
@@ -107,7 +112,7 @@ void Figur::setAttackersDiagonalFields()
     else
       break;
   }
-  for (int x = coord.x + 1, y = coord.y - 1; x < 8 && y > 0; x++, y--)
+  for (size_t x = coord.x + 1, y = coord.y - 1; x < 8 && y > 0; x++, y--)
   {
     FieldPtr field = Engine::getEngine()->getField(Coord(x, y));
     if (field)
@@ -119,7 +124,7 @@ void Figur::setAttackersDiagonalFields()
     else
       break;
   }
-  for (int x = coord.x - 1, y = coord.y - 1; x > 0 && y > 0; x--, y--)
+  for (size_t x = coord.x - 1, y = coord.y - 1; x > 0 && y > 0; x--, y--)
   {
     FieldPtr field = Engine::getEngine()->getField(Coord(x, y));
     if (field)
@@ -142,13 +147,16 @@ Pawn::~Pawn()
 {
 }
 
-bool Pawn::validMove(Coord targetCoord, bool capture)
+bool Pawn::validMove(FieldPtr targetField)
 {
   bool result = false;
 
+  Coord targetCoord = targetField->getCoord();
+  bool  capture     = targetField->getActiveFigur() != nullptr;
+
   if (!capture && coord.y == targetCoord.y)
   {
-    int diff = targetCoord.x - coord.x;
+    int diff = (int)targetCoord.x - (int)coord.x;
 
     if (color == Color::WHITE)
       result = diff == 1 || (!moved && diff == 2);
@@ -157,7 +165,7 @@ bool Pawn::validMove(Coord targetCoord, bool capture)
   }
   else if (capture && abs((int)(coord.y - targetCoord.y)) == 1)
   {
-    int diff = targetCoord.x - coord.x;
+    int diff = (int)targetCoord.x - (int)coord.x;
 
     result = color == Color::WHITE ? diff == 1 : diff == -1;
   }
@@ -184,14 +192,6 @@ Knight::Knight(Color color) : Figur(color)
 
 Knight::~Knight()
 {
-}
-
-bool Knight::validMove(Coord targetCoord, bool capture)
-{
-  int diffX = targetCoord.x - coord.x;
-  int diffY = targetCoord.y - coord.y;
-
-  return (abs(diffX) == 2 && abs(diffY) == 1) || (abs(diffX) == 1 && abs(diffY) == 2);
 }
 
 void Knight::setAttackedFields()
@@ -224,14 +224,6 @@ Queen::~Queen()
 {
 }
 
-bool Queen::validMove(Coord targetCoord, bool capture)
-{
-  int diffX = coord.x - targetCoord.x;
-  int diffY = coord.y - targetCoord.y;
-
-  return coord.x == targetCoord.x || coord.y == targetCoord.y || abs(diffX) == abs(diffY);
-}
-
 void Queen::setAttackedFields()
 {
   setAttackersStraightFields();
@@ -246,14 +238,6 @@ King::King(Color color) : Figur(color)
 
 King::~King()
 {
-}
-
-bool King::validMove(Coord targetCoord, bool capture)
-{
-  int diffX = coord.x - targetCoord.x;
-  int diffY = coord.y - targetCoord.y;
-
-  return abs(diffX) <= 1 && abs(diffY) <= 1;
 }
 
 void King::setAttackedFields()
@@ -277,11 +261,6 @@ Rook::~Rook()
 {
 }
 
-bool Rook::validMove(Coord targetCoord, bool capture)
-{
-  return coord.x == targetCoord.x || coord.y == targetCoord.y;
-}
-
 void Rook::setAttackedFields()
 {
   setAttackersStraightFields();
@@ -294,14 +273,6 @@ Bishop::Bishop(Color color) : Figur(color)
 
 Bishop::~Bishop()
 {
-}
-
-bool Bishop::validMove(Coord targetCoord, bool capture)
-{
-  int diffX = coord.x - targetCoord.x;
-  int diffY = coord.y - targetCoord.y;
-
-  return abs(diffX) == abs(diffY);
 }
 
 void Bishop::setAttackedFields()
