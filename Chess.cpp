@@ -10,26 +10,15 @@ Chess::~Chess()
 {
 }
 
-void Chess::run()
+std::string Chess::processRequest(const std::string& entry)
 {
-  for (;;)
-  {
-    std::cout << engine.getOutput();
+  std::string result = "ERROR";
 
-    std::string entry;
-    std::getline(std::cin, entry);
-
-    processRequest(entry);
-  }
-}
-
-void Chess::processRequest(const std::string& entry)
-{
   Command command(entry);
 
   if (command.getType() == Type::COORD)
   {
-    engine.processNewCoords(command.getCoord());
+    result = engine.processNewCoords(command.getCoord());
   }
   else if (command.getType() == Type::LOG)
   {
@@ -41,6 +30,8 @@ void Chess::processRequest(const std::string& entry)
   }
   else
     std::cout << "unknown command type\n";
+
+  return result;
 }
 
 void Chess::processExit(int exitCode)

@@ -111,12 +111,14 @@ void Engine::processLogFigures(Argument arg)
   }
 }
 
-void Engine::processNewCoords(Coord coord)
+std::string Engine::processNewCoords(Coord coord)
 {
   if (activeField)
     selectTargetField(coord);
   else
     selectFigur(coord);
+
+  return Tool::coordToString(coord);
 }
 
 std::string Engine::getOutput()
