@@ -1,8 +1,11 @@
 
 #include "Chess.h"
+#include "Server.h"
 
 int main()
 {
   Chess chess;
-  chess.run();
+
+  Server server(chess);
+  server.run();
 }

@@ -16,7 +16,7 @@ public:
 
   void init();
   void processLogFigures(Argument arg);
-  void processNewCoords(Coord coord);
+  std::string processNewCoords(Coord coord);
 
   const FieldMat& getBoard()            const { return board; }
 
