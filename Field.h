@@ -19,15 +19,15 @@ public:
   Field(size_t x, size_t y);
   ~Field();
 
-  void        setActiveFigur(FigurPtr activeFigur);
+  void     setActiveFigur(FigurPtr activeFigur);
 
-  FigurPtr    getActiveFigur()                const { return activeFigur; }
-  Coord       getCoord()                      const { return coord; }
-  std::string getName()                       const { return Tool::coordToString(coord); }
+  FigurPtr getActiveFigur()                const { return activeFigur; }
+  Coord    getCoord()                      const { return coord; }
+  WSTRING  getName()                       const { return Tool::coordToString(coord); }
 
 private:
-  FigurPtr    activeFigur = nullptr;
-  Coord       coord;
+  FigurPtr activeFigur = nullptr;
+  Coord    coord;
 };
 
 #endif // !FIELD_H

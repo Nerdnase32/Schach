@@ -4,7 +4,7 @@
 
 Figur::Figur(Color color) : color(color)
 {
-  name = "Figur";
+  name = L"Figur";
 }
 
 Figur::~Figur()
@@ -146,7 +146,7 @@ void Figur::setAttackersDiagonalFields()
 
 Pawn::Pawn(Color color) : Figur(color)
 {
-  name = "Pawn";
+  name = L"Pawn";
 }
 
 Pawn::~Pawn()
@@ -156,8 +156,6 @@ Pawn::~Pawn()
 bool Pawn::validMove(FieldPtr targetField)
 {
   bool result = false;
-
-  
 
   if (targetField->getActiveFigur())
   {
@@ -190,7 +188,7 @@ void Pawn::setAttackedFields()
 
 Knight::Knight(Color color) : Figur(color)
 {
-  name = "Knight";
+  name = L"Knight";
   jump = true;
 }
 
@@ -232,7 +230,7 @@ void Knight::setAttackedFields()
 
 Queen::Queen(Color color) : Figur(color)
 {
-  name = "Queen";
+  name = L"Queen";
 }
 
 Queen::~Queen()
@@ -247,7 +245,7 @@ void Queen::setAttackedFields()
 
 King::King(Color color) : Figur(color)
 {
-  name = "King";
+  name = L"King";
   invincible = true;
 }
 
@@ -272,7 +270,7 @@ void King::setAttackedFields()
 
 Rook::Rook(Color color) : Figur(color)
 {
-  name = "Rook";
+  name = L"Rook";
 }
 
 Rook::~Rook()
@@ -286,7 +284,7 @@ void Rook::setAttackedFields()
 
 Bishop::Bishop(Color color) : Figur(color)
 {
-  name = "Bishop";
+  name = L"Bishop";
 }
 
 Bishop::~Bishop()

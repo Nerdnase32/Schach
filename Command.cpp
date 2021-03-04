@@ -1,7 +1,7 @@
 
 #include "Command.h"
 
-Command::Command(const std::string& command) : command(command)
+Command::Command(const WSTRING& command) : command(command)
 {
   encodeType();
   encodeArgument();
@@ -14,31 +14,27 @@ Command::~Command()
 
 void Command::encodeType()
 {
-  std::string typeStr = command;
+  WSTRING typeStr = command;
 
   auto it = typeStr.find('-');
-  if (it != std::string::npos)
+  if (it != WSTRING::npos)
     typeStr = typeStr.substr(0, it);
-
-  Tool::trim(typeStr);
 
   if (Tool::toUpper(typeStr) == TYPE_EXIT || Tool::toUpper(typeStr) == TYPE_QUIT)
     type = Type::EXIT;
-  else if (Tool::toUpper(typeStr) == TYPE_LOG)
-    type = Type::LOG;
+  else if (Tool::toUpper(typeStr) == TYPE_INIT)
+    type = Type::INIT;
   else if (Tool::validFieldName(typeStr))
     type = Type::COORD;
 }
 
 void Command::encodeArgument()
 {
-  std::string optionStr = command;
+  WSTRING optionStr = command;
 
   auto it = optionStr.find('-');
-  if (it != std::string::npos)
+  if (it != WSTRING::npos)
     optionStr = optionStr.substr(it);
-    
-  Tool::trim(optionStr);
 
   if (optionStr == OPT_ONLY_MOVE)
     arg = Argument::ONLY_MOVED;
@@ -46,13 +42,11 @@ void Command::encodeArgument()
 
 void Command::encodeCoord()
 {
-  std::string coordStr = command;
+  WSTRING coordStr = command;
 
   auto it = coordStr.find('-');
-  if (it != std::string::npos)
+  if (it != WSTRING::npos)
     coordStr = coordStr.substr(0, it);
-
-  Tool::trim(coordStr);
 
   if (Tool::validFieldName(coordStr))
     coord = Tool::toCoord(coordStr);

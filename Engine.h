@@ -5,6 +5,8 @@
 #include "Checker.h"
 #include "Player.h"
 
+enum class Result {R_ERROR, MOVED, CHANGED};
+
 class Engine
 {
 private:
@@ -15,26 +17,26 @@ public:
   static Engine* getEngine();
 
   void init();
-  void processLogFigures(Argument arg);
-  std::string processNewCoords(Coord coord);
+  WSTRING processInitFigures(Argument arg);
+  WSTRING processNewCoords(Coord coord);
 
   const FieldMat& getBoard()            const { return board; }
 
-  std::string getOutput();
-  FieldPtr    getField(Coord coord);
+  WSTRING  getOutput();
+  FieldPtr getField(Coord coord);
 
 private:
   FigurPtr getActiveFigur(Coord coord);
 
-  void selectFigur(Coord coord);
-  void selectTargetField(Coord coord);
+  bool selectFigur(Coord coord);
+  bool selectTargetField(Coord coord);
   void switchPlayer();
   void changeField(FieldPtr targetField);
   void moveFigur(FieldPtr origField, FieldPtr targetField);
   void moveBack(FieldPtr origField, FieldPtr targetField);
 
   bool checkCheck();
-  bool tryMove(FieldPtr origField, FieldPtr targetField);
+  Result tryMove(FieldPtr origField, FieldPtr targetField);
   bool tryCaptureFigur(FieldPtr origField, FieldPtr targetField);
   bool tryMoveFigur(FieldPtr origField, FieldPtr targetField);
 

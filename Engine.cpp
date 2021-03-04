@@ -73,15 +73,14 @@ void Engine::init()
   white->updateFigures();
   black->updateFigures();
 
-  activePlayer   = white;
+  activePlayer = white;
   inactivePlayer = black;
 }
 
-void Engine::processLogFigures(Argument arg)
+WSTRING Engine::processInitFigures(Argument arg)
 {
-  std::string log;
+  WSTRING result;
 
-  int counter = 0;
   for (size_t x = 0; x < 8; x++)
   {
     for (size_t y = 0; y < 8; y++)
@@ -91,44 +90,39 @@ void Engine::processLogFigures(Argument arg)
       {
         if (arg != Argument::ONLY_MOVED || activeFigur->hasMoved())
         {
-          log += Tool::colorToString(activeFigur->getColor()) + " " + activeFigur->getName() + " on " + Tool::coordToString(activeFigur->getCoord());
-
-          counter++;
-          if (counter % 4 == 0)
-            log += " \n";
-          else
-            log += ", ";
+          result += Tool::colorToString(activeFigur->getColor()) + L" " + activeFigur->getName() + L" on " + Tool::coordToString(activeFigur->getCoord());
+          result += L", ";
         }
       }
     }
   }
 
-  if (log.length())
-  {
-    log.replace(log.length() - 2, log.length(), " \n");
+  if (result.length())
+    result.replace(result.length() - 2, result.length(), L" \n");
 
-    std::cout << log;
-  }
+  return result;
 }
 
-std::string Engine::processNewCoords(Coord coord)
+WSTRING Engine::processNewCoords(Coord coord)
 {
+  bool result = false;
+
   if (activeField)
-    selectTargetField(coord);
+    result = selectTargetField(coord);
   else
-    selectFigur(coord);
+    result = selectFigur(coord);
 
-  return Tool::coordToString(coord);
+  return result ? Tool::coordToString(coord) : L"ERROR";
 }
 
-std::string Engine::getOutput()
+WSTRING Engine::getOutput()
 {
-  std::string output;
+  WSTRING output;
 
   if (activeField == nullptr)
-    output = Tool::colorToString(activePlayer->getColor()) + " choose figur\n";
+    output = Tool::colorToString(activePlayer->getColor()) + L" choose figur\n";
   else
-    output = "choose target field or another figur\n";
+    output = L"choose target field or another figur\n";
 
   return output;
 }
@@ -154,8 +148,10 @@ FigurPtr Engine::getActiveFigur(Coord coord)
   return activeFigur;
 }
 
-void Engine::selectFigur(Coord coord)
+bool Engine::selectFigur(Coord coord)
 {
+  bool result = false;
+
   FieldPtr field = getField(coord);
   if (field)
   {
@@ -165,26 +161,37 @@ void Engine::selectFigur(Coord coord)
       if (activeFigur->getColor() == activePlayer->getColor())
       {
         activeField = field;
-        std::cout << field->getActiveFigur()->getName() + " selected\n";
+        _tprintf(L"%s selected\n", field->getActiveFigur()->getName().c_str());
+        result = true;
       }
       else
-        std::cout << "figur has wrong color\n";
+        _tprintf(L"figur has wrong color\n");
     }
     else
-      std::cout << "no figur on field " << Tool::coordToString(coord) << "\n";
+      _tprintf(L"no figur on field %s\n", Tool::coordToString(coord).c_str());
   }
   else
-    std::cout << "invalid field " << Tool::coordToString(coord) << "\n";
+    _tprintf(L"invalid field %s\n", Tool::coordToString(coord).c_str());
+
+  return result;
 }
 
-void Engine::selectTargetField(Coord coord)
+bool Engine::selectTargetField(Coord coord)
 {
+  Result result = Result::R_ERROR;
+
   FieldPtr targetField = getField(coord);
-  if (targetField && tryMove(activeField, targetField))
+  if (targetField)
   {
-    switchPlayer();
-    activeField = nullptr;
+    result = tryMove(activeField, targetField);
+    if (result == Result::MOVED)
+    {
+      switchPlayer();
+      activeField = nullptr;
+    }
   }
+
+  return result != Result::R_ERROR;
 }
 
 void Engine::switchPlayer()
@@ -199,14 +206,14 @@ void Engine::changeField(FieldPtr targetField)
   activeField = targetField;
 
   if (targetField->getActiveFigur())
-    std::cout << "figur changed to " << targetField->getActiveFigur()->getName() + "\n";
+    _tprintf(L"figur changed to %s\n", targetField->getActiveFigur()->getName().c_str());
   else
-    std::cout << "no figur on field";
+    _tprintf(L"no figur on field");
 }
 
-bool Engine::tryMove(FieldPtr origField, FieldPtr targetField)
+Result Engine::tryMove(FieldPtr origField, FieldPtr targetField)
 {
-  bool result = false;
+  Result result = Result::R_ERROR;
 
   FigurPtr activeFigur = origField->getActiveFigur();
   if (activeFigur)
@@ -217,17 +224,20 @@ bool Engine::tryMove(FieldPtr origField, FieldPtr targetField)
       if (targetFigur->getColor() == activePlayer->getColor())
       {
         changeField(targetField);
+        result = Result::CHANGED;
       }
       else if (targetFigur->isInvincible())
       {
-        std::cout << "can't capture " + targetFigur->getName() + "\n";
+        _tprintf(L"can't capture %s\n", targetFigur->getName().c_str());
       }
       else
       {
         if (tryCaptureFigur(origField, targetField))
         {
-          if (!(result = checkCheck()))
+          if (!(checkCheck()))
             moveBack(origField, targetField);
+          else
+            result = Result::MOVED;
         }
       }
     }
@@ -235,14 +245,16 @@ bool Engine::tryMove(FieldPtr origField, FieldPtr targetField)
     {
       if (tryMoveFigur(origField, targetField))
       {
-        if (!(result = checkCheck()))
+        if (!(checkCheck()))
           moveBack(origField, targetField);
+        else
+          result = Result::MOVED;
       }
     }
   }
   else
-    std::cout << "no figur on field\n";
-    
+    _tprintf(L"no figur on field");
+
   return result;
 }
 
@@ -251,7 +263,7 @@ void Engine::moveFigur(FieldPtr origField, FieldPtr targetField)
   FigurPtr activeFigur = origField->getActiveFigur();
 
   tempCapturedFigure = targetField->getActiveFigur();
-  tempMoved          = activeFigur->hasMoved();
+  tempMoved = activeFigur->hasMoved();
 
   origField->setActiveFigur(nullptr);
   targetField->setActiveFigur(activeFigur);
@@ -260,7 +272,7 @@ void Engine::moveFigur(FieldPtr origField, FieldPtr targetField)
   activePlayer->updateFigures();
   inactivePlayer->updateFigures();
 
-  std::cout << activeFigur->getName() + " moved to " + targetField->getName() + "\n";
+  _tprintf(L"%s moved to %s\n", activeFigur->getName().c_str(), targetField->getName().c_str());
 }
 
 void Engine::moveBack(FieldPtr origField, FieldPtr targetField)
@@ -286,12 +298,12 @@ bool Engine::checkCheck()
 
   if (activeCheck)
   {
-    std::cout << "Invalid move. Own King is checked\n";
+    _tprintf(L"Invalid move. Own King is checked\n");
     result = false;
   }
 
   if (inactiveCheck)
-    std::cout << "check!\n";
+    _tprintf(L"check\n");
 
   return result;
 }
@@ -306,7 +318,7 @@ bool Engine::tryCaptureFigur(FieldPtr origField, FieldPtr targetField)
     FigurPtr targetFigur = targetField->getActiveFigur();
     if (targetFigur)
     {
-      std::cout << targetFigur->getName() + " captured\n";
+      _tprintf(L"%s captured\n", targetFigur->getName().c_str());
 
       inactivePlayer->addLostFigure(targetFigur);
       inactivePlayer->removeFigure(targetFigur);
@@ -317,7 +329,7 @@ bool Engine::tryCaptureFigur(FieldPtr origField, FieldPtr targetField)
     }
   }
   else
-    std::cout << "invalid move\n";
+    _tprintf(L"invalid move");
 
   return result;
 }
@@ -334,7 +346,7 @@ bool Engine::tryMoveFigur(FieldPtr origField, FieldPtr targetField)
     result = true;
   }
   else
-    std::cout << "invalid move\n";
+    _tprintf(L"invalid move");
 
   return result;
 }

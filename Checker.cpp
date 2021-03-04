@@ -33,10 +33,7 @@ bool Checker::checkCheck(PlayerPtr activePlayer, FieldPtr kingField)
   {
     const FieldSet& attackedFields = figur->getAttackedFields();
     if (attackedFields.find(kingField) != attackedFields.end())
-    {
-      std::cout << Tool::colorToString(Tool::toOppoColor(activePlayer->getColor())) << " checked by " << figur->getName() << "\n";
       return true;
-    }
   }
 
   return false;

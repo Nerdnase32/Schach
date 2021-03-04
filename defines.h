@@ -5,16 +5,16 @@
 #define EXIT_SUCESS 0
 #define EXIT_FAIL   1
 
-#define TYPE_LOG  "LOG"
-#define TYPE_QUIT "QUIT"
-#define TYPE_EXIT "EXIT"
+#define TYPE_INIT L"INIT"
+#define TYPE_QUIT L"QUIT"
+#define TYPE_EXIT L"EXIT"
 
-#define OPT_ONLY_MOVE "-m"
+#define OPT_ONLY_MOVE L"-m"
 
-typedef unsigned int uint;
+typedef std::wstring WSTRING;
 
 enum class Argument { ONLY_MOVED, UNKNOWN };
-enum class Type     { LOG, EXIT, COORD, UNKNOWN };
+enum class Type     { INIT, EXIT, COORD, UNKNOWN };
 enum class Color    { WHITE, BLACK, UNKNOWN };
 
 #endif // !DEFINES_H

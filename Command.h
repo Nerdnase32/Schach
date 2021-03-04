@@ -7,7 +7,7 @@
 class Command
 {
 public:
-  Command(const std::string& command);
+  Command(const WSTRING& command);
   ~Command();
 
   Type     getType()     { return type; }
@@ -20,7 +20,7 @@ private:
   void encodeCoord();
 
 private:
-  std::string command;
+  WSTRING command;
 
   Type     type = Type::UNKNOWN;
   Argument arg  = Argument::UNKNOWN;

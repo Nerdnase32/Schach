@@ -16,19 +16,19 @@ public:
 
   void updateFigures();
 
-  bool        isCheck()                     const { return check; }
-  Color       getColor()                    const { return color; }
-  std::string getName()                     const { return Tool::colorToString(color); }
-  KingPtr     getKing()                     const { return king; }
+  bool    isCheck()                     const { return check; }
+  Color   getColor()                    const { return color; }
+  WSTRING getName()                     const { return Tool::colorToString(color); }
+  KingPtr getKing()                     const { return king; }
 
-  const FigurSet& getLostFigures()          const { return lostFigures; }
-  const FigurSet& getFigures()              const { return figures; }
+  const FigurSet& getLostFigures()      const { return lostFigures; }
+  const FigurSet& getFigures()          const { return figures; }
 
-  void setCheck(bool check)                       { this->check = check; }
-  void setKing(KingPtr king)                      { this->king = king; }
-  void addLostFigure(FigurPtr activeFigur)        { this->lostFigures.insert(activeFigur); }
-  void addFigure(FigurPtr figur)                  { this->figures.insert(figur); }
-  void removeFigure(FigurPtr figur)               { this->figures.erase(figur); }
+  void setCheck(bool check)                   { this->check = check; }
+  void setKing(KingPtr king)                  { this->king = king; }
+  void addLostFigure(FigurPtr activeFigur)    { this->lostFigures.insert(activeFigur); }
+  void addFigure(FigurPtr figur)              { this->figures.insert(figur); }
+  void removeFigure(FigurPtr figur)           { this->figures.erase(figur); }
 
 private:
   FigurSet lostFigures;

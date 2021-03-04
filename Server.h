@@ -7,11 +7,10 @@
 #include <strsafe.h>
 #include "Windows.h"
 #include "Chess.h"
+#include <string>
 
-#define BUFSIZE 512
+#define BUFSIZE 1024
 #define PIPE_NAME "\\\\.\\pipe\\Pipe"
-
-typedef unsigned long ulong;
 
 class Server
 {
@@ -22,7 +21,8 @@ public:
   int run(void);
 
 private:
-  void getAnswerToRequest(LPCTSTR reply, LPTSTR pchRequest, LPTSTR pchReply, ulong& pchBytes);
+  void convertReply(const WSTRING& reply, LPTSTR pchReply, DWORD& pchBytes);
+  HANDLE openPipe(LPCTSTR pipeName);
 
 private:
   Chess& chess;

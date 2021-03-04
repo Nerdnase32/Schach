@@ -16,18 +16,18 @@ public:
   Figur(Color color);
   ~Figur();
 
-  void        updateAttackedFields();
-  void        clearAttackedField();
-  void        setCoord(Coord coord)     { this->coord = coord; }
-  void        setMoved(bool moved)      { this->moved = moved; }
+  void     updateAttackedFields();
+  void     clearAttackedField();
+  void     setCoord(Coord coord)     { this->coord = coord; }
+  void     setMoved(bool moved)      { this->moved = moved; }
 
-  bool        hasMoved()          const { return moved; }
-  bool        canJump()           const { return jump; }
-  bool        isInvincible()      const { return invincible; }
-  std::string getName()           const { return name; }
-  Color       getColor()          const { return color; }
-  Coord       getCoord()          const { return coord; }
-  FieldSet    getAttackedFields() const { return attackedFields; }
+  bool     hasMoved()          const { return moved; }
+  bool     canJump()           const { return jump; }
+  bool     isInvincible()      const { return invincible; }
+  WSTRING  getName()           const { return name; }
+  Color    getColor()          const { return color; }
+  Coord    getCoord()          const { return coord; }
+  FieldSet getAttackedFields() const { return attackedFields; }
 
   virtual bool validMove(FieldPtr targetField);
 
@@ -40,14 +40,14 @@ protected:
   void setAttackersDiagonalFields();
 
 protected:
-  bool        invincible = false;
-  bool        moved      = false;
-  bool        jump       = false;
-  double      value      = 0;
-  Color       color      = Color::UNKNOWN;
-  Coord       coord;
-  FieldSet    attackedFields;
-  std::string name;
+  bool     invincible = false;
+  bool     moved      = false;
+  bool     jump       = false;
+  double   value      = 0;
+  Color    color      = Color::UNKNOWN;
+  Coord    coord;
+  FieldSet attackedFields;
+  WSTRING  name;
 
 };
 

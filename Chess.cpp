@@ -10,9 +10,9 @@ Chess::~Chess()
 {
 }
 
-std::string Chess::processRequest(const std::string& entry)
+WSTRING Chess::processRequest(const WSTRING& entry)
 {
-  std::string result = "ERROR";
+  WSTRING result = L"ERROR";
 
   Command command(entry);
 
@@ -20,16 +20,16 @@ std::string Chess::processRequest(const std::string& entry)
   {
     result = engine.processNewCoords(command.getCoord());
   }
-  else if (command.getType() == Type::LOG)
+  else if (command.getType() == Type::INIT)
   {
-    engine.processLogFigures(command.getArgument());
+    result = engine.processInitFigures(command.getArgument());
   }
   else if (command.getType() == Type::EXIT)
   {
     processExit(EXIT_SUCCESS);
   }
   else
-    std::cout << "unknown command type\n";
+    _tprintf(L"unknown command type\n");
 
   return result;
 }

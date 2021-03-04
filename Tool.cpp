@@ -5,18 +5,18 @@ Coord::Coord()
 {
 }
 
-Coord::Coord(size_t x, size_t y) : x(x), y(y)
+Coord::Coord(UINT x, UINT y) : x(x), y(y)
 {
 }
 
-bool Tool::validFieldName(const std::string& fieldName)
+BOOL Tool::validFieldName(const WSTRING& fieldName)
 {
-  bool result = false;
+  BOOL result = false;
 
   if (fieldName.length() == 2)
   {
-    int x = letterToInt(fieldName[0]);
-    int y = atoi(&fieldName[1]);
+    INT x = letterToInt(fieldName[0]);
+    INT y = UINT(fieldName[1]);
 
     result = x > 0 && x <= 8 && y > 0 && y <= 8;
   }
@@ -24,64 +24,41 @@ bool Tool::validFieldName(const std::string& fieldName)
   return result;
 }
 
-std::string Tool::toUpper(const std::string& str)
+WSTRING Tool::toUpper(const WSTRING& str)
 {
-  std::string upperStr;
-  for (auto c : str)
+  WSTRING upperStr;
+  for (const auto& c : str)
     upperStr += toupper(c);
 
   return upperStr;
 }
 
-std::string Tool::ltrim(std::string& str)
+WSTRING Tool::colorToString(Color color)
 {
-  str.erase(str.begin(), std::find_if(str.begin(), str.end(),
-    std::not1(std::ptr_fun<int, int>(std::isspace))));
-
-  return str;
-}
-
-std::string Tool::rtrim(std::string& str)
-{
-  str.erase(std::find_if(str.rbegin(), str.rend(),
-    std::not1(std::ptr_fun<int, int>(std::isspace))).base(), str.end());
-
-  return str;
-}
-
-std::string Tool::trim(std::string& str)
-{
-  ltrim(str);
-  rtrim(str);
-
-  return str;
-}
-
-std::string Tool::colorToString(Color color)
-{
-  std::string result = "unknown";
+  WSTRING result = TEXT("unknown");
 
   switch (color)
   {
   case Color::WHITE:
-    result = "White";
+    result = TEXT("White");
     break;
   case Color::BLACK:
-    result = "Black";
+    result = TEXT("Black");
     break;
   }
 
   return result;
 }
 
-std::string Tool::coordToString(Coord coord)
+WSTRING Tool::coordToString(Coord coord)
 {
-  char c = (char)coord.y + 65;
+  WCHAR x = WCHAR(coord.y + 65);
+  WCHAR y = WCHAR(coord.x + 1);
 
-  return c + std::to_string(coord.x + 1);
+  return WSTRING(1, x + y);
 }
 
-Coord Tool::toCoord(const std::string& name)
+Coord Tool::toCoord(const WSTRING& name)
 {
   Coord coord;
 

@@ -11,7 +11,7 @@ public:
   Chess();
   ~Chess();
 
-  std::string processRequest(const std::string& entry);
+  WSTRING processRequest(const WSTRING& entry);
 
 private:
   void processExit(int exitCode);

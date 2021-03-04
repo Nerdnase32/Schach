@@ -11,91 +11,45 @@ Server::~Server()
 
 int Server::run(void)
 {
-  LPCTSTR lpszPipename = TEXT(PIPE_NAME);
-
   for (;;)
   {
-    _tprintf(TEXT("\nPipe Server: Main thread awaiting client connection on %s\n"), lpszPipename);
-
-    ulong  openMode = PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT;
-    HANDLE pipe     = CreateNamedPipe(lpszPipename, PIPE_ACCESS_DUPLEX, openMode, PIPE_UNLIMITED_INSTANCES, BUFSIZE, BUFSIZE, 0, NULL);
-
-    if (pipe == INVALID_HANDLE_VALUE)
-    {
-      _tprintf(TEXT("CreateNamedPipe failed, GLE=%d.\n"), GetLastError());
-      return -1;
-    }
-
-    BOOL fConnected = ConnectNamedPipe(pipe, NULL) ? TRUE : GetLastError() == ERROR_PIPE_CONNECTED;
-
-    if (fConnected)
+    HANDLE pipe = openPipe(TEXT(PIPE_NAME));
+    if (pipe)
     {
       printf("Client connected, creating a processing thread.\n");
 
-      HANDLE hHeap = GetProcessHeap();
-      TCHAR* pchRequest = (TCHAR*)HeapAlloc(hHeap, 0, BUFSIZE * sizeof(TCHAR));
-      TCHAR* pchReply = (TCHAR*)HeapAlloc(hHeap, 0, BUFSIZE * sizeof(TCHAR));
-
-      if (pipe == NULL)
-      {
-        printf("\nERROR - Pipe Server Failure:\n");
-        printf("   InstanceThread got an unexpected NULL value in lpvParam.\n");
-        printf("   InstanceThread exitting.\n");
-        if (pchReply != NULL) HeapFree(hHeap, 0, pchReply);
-        if (pchRequest != NULL) HeapFree(hHeap, 0, pchRequest);
-        return -1;
-      }
-
-      if (pchRequest == NULL)
-      {
-        printf("\nERROR - Pipe Server Failure:\n");
-        printf("   InstanceThread got an unexpected NULL heap allocation.\n");
-        printf("   InstanceThread exitting.\n");
-        if (pchReply != NULL) HeapFree(hHeap, 0, pchReply);
-        return -1;
-      }
-
-      if (pchReply == NULL)
-      {
-        printf("\nERROR - Pipe Server Failure:\n");
-        printf("   InstanceThread got an unexpected NULL heap allocation.\n");
-        printf("   InstanceThread exitting.\n");
-        if (pchRequest != NULL) HeapFree(hHeap, 0, pchRequest);
-        return -1;
-      }
-
-      printf("InstanceThread created, receiving and processing messages.\n");
-
+      HANDLE heap = GetProcessHeap();
+      LPTSTR pchRequest = (LPTSTR)HeapAlloc(heap, 0, BUFSIZE * sizeof(CHAR));
+      LPTSTR pchReply   = (LPTSTR)HeapAlloc(heap, 0, BUFSIZE * sizeof(CHAR));
 
       for (;;)
       {
-        ulong cbBytesRead = 0;
-        BOOL fSuccess = ReadFile(pipe, pchRequest, BUFSIZE * sizeof(TCHAR), &cbBytesRead, NULL);
+        DWORD cbBytesRead = 0;
+
+        TCHAR pchRequest;
+        BOOL fSuccess = ReadFile(pipe, &pchRequest, BUFSIZE * sizeof(CHAR), &cbBytesRead, NULL);
 
         if (!fSuccess || cbBytesRead == 0)
         {
           if (GetLastError() == ERROR_BROKEN_PIPE)
-          {
-            _tprintf(TEXT("InstanceThread: client disconnected.\n"));
-          }
+            _tprintf(TEXT("Client disconnected.\n"));
           else
-          {
-            _tprintf(TEXT("InstanceThread ReadFile failed, GLE=%d.\n"), GetLastError());
-          }
+            _tprintf(TEXT("ReadFile failed, GLE=%d.\n"), GetLastError());
+
           break;
         }
 
-        std::string reply = chess.processRequest(pchRequest);
+        WSTRING reply = chess.processRequest(&pchRequest);
 
-        ulong cbReplyBytes = 0;
-        getAnswerToRequest(reply.c_str(), pchRequest, pchReply, cbReplyBytes);
+        DWORD cbReplyBytes = 0;
+        convertReply(reply.c_str(), pchReply, cbReplyBytes);
 
-        ulong cbWritten = 0;
+        DWORD cbWritten = 0;
         fSuccess = WriteFile(pipe, pchReply, cbReplyBytes, &cbWritten, NULL);
 
         if (!fSuccess || cbReplyBytes != cbWritten)
         {
-          _tprintf(TEXT("InstanceThread WriteFile failed, GLE=%d.\n"), GetLastError());
+          _tprintf(TEXT("WriteFile failed, GLE=%d.\n"), GetLastError());
           break;
         }
       }
@@ -104,28 +58,42 @@ int Server::run(void)
       DisconnectNamedPipe(pipe);
       CloseHandle(pipe);
 
-      HeapFree(hHeap, 0, pchRequest);
-      HeapFree(hHeap, 0, pchReply);
-
-      printf("InstanceThread exiting.\n");
+      HeapFree(heap, 0, pchRequest);
+      HeapFree(heap, 0, pchReply);
     }
     else
-      CloseHandle(pipe);
+      return -1;
   }
 
   return 0;
 }
 
-void Server::getAnswerToRequest(LPCTSTR reply, LPTSTR pchRequest, LPTSTR pchReply, ulong& pchBytes)
+void Server::convertReply(const WSTRING& reply, LPTSTR pchReply, DWORD& pchBytes)
 {
-  _tprintf(TEXT("Client Request String:\"%s\"\n"), pchRequest);
-
-  if (FAILED(StringCchCopy(pchReply, BUFSIZE, reply)))
+  if (FAILED(StringCchCopy(pchReply, BUFSIZE, reply.c_str())))
   {
     pchBytes = 0;
     pchReply[0] = 0;
     printf("StringCchCopy failed, no outgoing message.\n");
     return;
   }
-  pchBytes = (lstrlen(pchReply) + 1) * sizeof(TCHAR);
+  pchBytes = (lstrlen(pchReply) + 1) * sizeof(CHAR);
+}
+
+HANDLE Server::openPipe(LPCTSTR pipeName)
+{
+  _tprintf(TEXT("\nPipe Server awaiting client connection on %s\n"), pipeName);
+
+  DWORD  openMode = PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT;
+  HANDLE pipe = CreateNamedPipe(pipeName, PIPE_ACCESS_DUPLEX, openMode, PIPE_UNLIMITED_INSTANCES, BUFSIZE, BUFSIZE, 0, NULL);
+
+  if (pipe == INVALID_HANDLE_VALUE)
+  {
+    _tprintf(TEXT("CreateNamedPipe failed, GLE=%d.\n"), GetLastError());
+    return nullptr;
+  }
+
+  ConnectNamedPipe(pipe, NULL);
+
+  return pipe;
 }
